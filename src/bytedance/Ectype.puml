@@ -1,0 +1,12 @@
+@startuml
+
+Client -> Gate: 发起进入副本请求，Gate选取一个负载合适的SceneServer
+Gate -> NewScene: 创建副本场景请求
+NewScene--> Gate: 创建成功返回
+Gate -> OldScene: 发起切换场景请求
+OldScene --> Gate: 原场景退出成功，同时记录玩家所在原场景的信息
+Gate-> NewScene: 进入新场景
+NewScene --> Gate: 进入成功
+Gate --> Client: 返回客户端
+
+@enduml

@@ -1,0 +1,42 @@
+import javax.tools.JavaCompiler
+
+plugins {
+    id 'java'
+}
+
+tasks.withType(JavaCompiler) {
+    options.encoding = 'GBK'
+}
+
+group 'xiong'
+version '0.0.1'
+
+sourceCompatibility = 11
+
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/']
+        }
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir:'lib',include:['*.jar'])
+
+    compile 'cn.hutool:hutool-core:5.2.4'
+
+    compile 'org.freemarker:freemarker:2.3.29'
+
+    // https://mvnrepository.com/artifact/redis.clients/jedis
+    compile group: 'redis.clients', name: 'jedis', version: '3.2.0'
+
+    compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0'
+
+}

@@ -1,0 +1,38 @@
+@startuml
+
+Client -> 区服列表SLB: 请求区服列表
+区服列表SLB --> Client: 返回区服列表
+Client -> Login: 客户端发起登录
+Login -> Gate1: 推送该即将登陆信息
+Login --> Client: 校验账号返回token，拿到Gate1地址
+
+Client -> Gate1: 发起连接，开始绑定账号操作
+Gate1 -> Center: 去往中心服绑定，假设该账号在某Gate2上已经登录了
+Center -> Gate2: 将该玩家踢下线，先断掉soket连接
+Gate2 -> Scene2: 发起从场景中移除该玩家的操作
+Scene2 --> Gate2: 移除完毕，保存相关数据
+Gate2 -> Logic2: 保存相关数据，清理logic2上的user信息
+Logic2 --> Gate2: 老的登录信息全部清理完毕
+Gate2 -> Center: 转发该消息，Center开始处理新的登录
+Center --> Gate1: 绑定成功
+Gate1 --> Client: 转发绑定成功
+
+Client -> Gate1: 拉角色列表
+Gate1 --> Client: 返回角色列表
+
+Client -> Gate1: 发起创角流程
+Gate1  -> Center: 转发创角, Center上创建完毕
+Center --> Gate1: 发送角色详情
+Gate1 --> Client: 转发角色详情
+
+Client -> Gate1: 客户端发起登录
+Gate1 -> Center: 转发登录
+Center --> Gate1: 校验完毕后开始登录
+Gate1 -> Logic1: logic上开始登录
+Logic1 --> Gate1: 取出数据，准备往scene1上创建实体
+Gate1 -> Scene1: 创建场景实体
+Scene1 --> Gate1: 创建成功，整个登录流程完成
+Gate1 -> Center: 登录完毕,在center上注册该登录的roleid
+Gate1 --> Client: 返回进场景消息
+
+@enduml

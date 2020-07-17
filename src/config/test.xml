@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--thie is a content-->
+<protocol name="login">
+    <field name="roleid" type="long"/>
+</protocol>
