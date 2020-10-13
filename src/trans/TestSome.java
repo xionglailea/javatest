@@ -81,13 +81,13 @@ public class TestSome {
 //        double a = 1.0;
 //        System.out.println(position2IndexX(a));
 //        System.out.println(decode("3EL0AXIW37"));
-//        testTreeMap();
+        testTreeMap();
 //        testArray();
 //        float a= 1f;
 //        double b = 1;
 //        System.out.println(Math.atan2(1.0, 0.0) * 180 / Math.PI);  //计算 arc tan
 //        System.out.println(a*b);
-        sortTest();
+//        sortTest();
     }
 
     public static void removeMapKey(int key){
@@ -258,7 +258,12 @@ public class TestSome {
 
 
     public static void testTreeMap(){
-        Map<Integer, String> test = new TreeMap<>(); //treemap默认是用key做排序的
+        Map<Integer, String> test = new TreeMap<>(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return Integer.compare(o2,o1);
+            }
+        }); //treemap默认是用key做排序的
         for(int i = 0; i < 100; i++){
             int key = random.nextInt(1000);
             if(!test.containsKey(key)){
