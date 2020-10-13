@@ -1,9 +1,7 @@
 build
 .gradle
 .idea
-gradle
 out
-gradle
 data
 Java2C#.iml
 gradlew
