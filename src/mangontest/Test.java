@@ -4,8 +4,8 @@ import org.bson.Document;
 
 public class Test {
   public static void main(String[] args) {
-//    testBatchInsert();
-    testReplace();
+    testBatchInsert1();
+    //testReplace();
   }
 
   public static void test1() {
@@ -51,6 +51,17 @@ public class Test {
     String collectionName = "roleInfo";
     long start = System.currentTimeMillis();
     for (long i = 4; i < 10004; i++) {
+      storage.testWrite(new RoleInfo(i, "xiong", 1));
+    }
+    long end = System.currentTimeMillis();
+    System.out.println("cost time = " + (end - start));
+  }
+
+  public static void testBatchInsert1() {
+    Storage storage = new Storage();
+    String collectionName = "roleInfo";
+    long start = System.currentTimeMillis();
+    for (long i = 0; i < 2; i++) {
       storage.testWrite(new RoleInfo(i, "xiong", 1));
     }
     long end = System.currentTimeMillis();

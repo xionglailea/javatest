@@ -35,9 +35,9 @@ public class Storage {
 
   public Storage() {
     //按host和port连接
-    //MongoClient mongoClient = MongoClients.create("mongodb://host1:27017");
-    this.client = MongoClients.create();
-    this.database = client.getDatabase("xiongDatabase");
+    this.client = MongoClients.create("mongodb://10.227.18.178:8017,10.227.18.178:8016,10.227.18.178:8015/test?replicaset=rstest");
+    //this.client = MongoClients.create();
+    this.database = client.getDatabase("test");
   }
 
   private MongoCollection<Document> getCollection(String collectionName) {

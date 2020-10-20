@@ -39,4 +39,8 @@ dependencies {
 
     compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0'
 
+    compile group: 'org.mongodb', name: 'mongodb-driver-sync', version: '3.12.7'
+
+    compile group: 'org.mongodb', name: 'mongodb-driver-core', version: '3.12.7'
+
 }
