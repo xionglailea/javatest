@@ -196,8 +196,18 @@ public class Test1 {
         //for (int i : list) {
         //    System.out.println(i);
         //}
-        System.out.println(binaryString2String("0101000001110010011011110110011101110010011000010110110101101101"));
-        System.out.println(binaryString2String("0110100101101110011001110100100101110011010001100111010101101110"));
+        //System.out.println(binaryString2String("0101000001110010011011110110011101110010011000010110110101101101"));
+        //System.out.println(binaryString2String("0110100101101110011001110100100101110011010001100111010101101110"));
+        byte b = Byte.parseByte("01111111", 2);
+        System.out.println(b);
+        System.out.println((int)b);
+        byte c = (byte)0b10000000;
+        System.out.println(c); //byte的位数是 (-128)-(127)
+        int d = (int)c; //有符号扩展 如果高位为0，扩展的时候int的高位都用0，如果高位为1，扩展的时候全填充1, 负数用补码实现
+        System.out.println(d);
+        int e = 0xff & c; // 无符号扩展
+        System.out.println(e);
+        // https://blog.csdn.net/LANGZI7758521/article/details/51853298 符号扩展讲解的很详细
     }
 
     public static void testThreadLocal() {
