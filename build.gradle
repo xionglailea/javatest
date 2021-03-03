@@ -43,4 +43,10 @@ dependencies {
 
     compile group: 'org.mongodb', name: 'mongodb-driver-core', version: '3.12.7'
 
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.54.Final'
+
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    implementation group: 'org.apache.poi', name: 'poi', version: '5.0.0'
+
+
 }

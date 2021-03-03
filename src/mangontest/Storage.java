@@ -42,13 +42,14 @@ public class Storage {
     }
 
     private MongoCollection<Document> getCollection(String collectionName) {
-        var result = collectionMap.get(collectionName);
-        if (result == null) {
-            //如果不存在，会自动创建 创建的时候带一些参数，可以指定创建的collection的内容
-            result = this.database.getCollection(collectionName);
-            collectionMap.put(collectionName, result);
-        }
-        return result;
+        return this.database.getCollection(collectionName);
+        //var result = collectionMap.get(collectionName);
+        //if (result == null) {
+        //    //如果不存在，会自动创建 创建的时候带一些参数，可以指定创建的collection的内容
+        //    result = this.database.getCollection(collectionName);
+        //    collectionMap.put(collectionName, result);
+        //}
+        //return result;
     }
 
     public void count(String collectionName) {
@@ -56,7 +57,7 @@ public class Storage {
     }
 
     public void travers(String collectionName) {
-        MongoCursor<Document> cursor = getCollection(collectionName).find().batchSize(10000).cursor();
+        MongoCursor<Document> cursor = getCollection(collectionName).find().cursor();
         try {
             while (cursor.hasNext()) {
                 System.out.println(cursor.next().toJson());
@@ -66,8 +67,16 @@ public class Storage {
         }
     }
 
+    public void traversWithOutCursor(String collectionName) {
+        //如果是执行find操作，没有指定batchsize和limit，那么默认返回的是101个数据
+        //如果是执行getmore操作，默认会返回所有数据
+        for (var result : getCollection(collectionName).find()) {
+            System.out.println(result.toJson());
+        }
+    }
+
     public Document queryByRoleId(String collectionName, int key) {
-        return getCollection(collectionName).find(Filters.eq("roleId", key)).first();
+        return getCollection(collectionName).find(Filters.eq("_id", key)).projection(new Document("roleName", 1)).first();
     }
 
     public void deleteOne(String collectionName, int key) {
@@ -107,8 +116,9 @@ public class Storage {
             System.out.println("roleid = " + roleId + " is null");
             return;
         }
-        RoleInfo roleInfo = new RoleInfo(doc.getLong("roleId"), doc.getString("roleName"), doc.getInteger("sex"));
-        System.out.println(roleInfo.toString());
+        System.out.println(doc);
+        //RoleInfo roleInfo = new RoleInfo(doc.getLong("roleId"), doc.getString("roleName"), doc.getInteger("sex"));
+        //System.out.println(roleInfo.toString());
     }
 
     public void testBatchRead(List<Integer> roleIds) {
@@ -121,6 +131,13 @@ public class Storage {
             }
         } finally {
             cursor.close();
+        }
+    }
+
+    public void testBatchReadWithOutCursor(List<Integer> roleIds) {
+        var collection = getCollection("roleInfo");
+        for (var result : collection.find(Filters.in("_id", roleIds))) {
+            System.out.println(result.toJson());
         }
     }
 

@@ -30,7 +30,7 @@ public class Test {
 
 
           test1();
-        //  testBatchRead();
+          //testBatchRead();
         //test11();
     }
 
@@ -111,7 +111,7 @@ public class Test {
 //    storage.testRead(1);
 //    storage.testRead(2);
         long start = System.currentTimeMillis();
-        for (int i = 30000; i < 40000; i++) {
+        for (int i = 30000; i < 30001; i++) {
             storage.testRead(i);
         }
         long end = System.currentTimeMillis();
@@ -125,6 +125,7 @@ public class Test {
         String collectionName = "roleInfo";
         long start = System.currentTimeMillis();
         storage.travers(collectionName);
+        //storage.traversWithOutCursor(collectionName);
         long end = System.currentTimeMillis();
         System.out.println("cost time = " + (end - start));
         //Document document = new Document("roleId", 3)
@@ -151,7 +152,7 @@ public class Test {
         //for (int i = 32000; i < 33000; i++) {
         //    roleIds3.add(i);
         //}
-        storage.testBatchRead(roleIds);
+        storage.testBatchReadWithOutCursor(roleIds);
         long end = System.currentTimeMillis();
         System.out.println("cost time = " + (end - start));
     }
@@ -169,7 +170,7 @@ public class Test {
     public static void testBatchInsert() {
         Storage storage = new Storage();
         long start = System.currentTimeMillis();
-        for (long i = 10000; i < 30000; i++) {
+        for (long i = 30000; i < 30010; i++) {
             storage.testWrite(new RoleInfo(i, "xiong", 1));
         }
         long end = System.currentTimeMillis();
