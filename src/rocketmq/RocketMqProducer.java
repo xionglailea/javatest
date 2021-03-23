@@ -2,6 +2,7 @@ package rocketmq;
 
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.common.RemotingHelper;
 
@@ -10,22 +11,32 @@ import org.apache.rocketmq.remoting.common.RemotingHelper;
  * <p>
  * create by xiongjieqing on 2021/3/22 20:33
  */
-public class RocketMq {
+public class RocketMqProducer {
 
     private final DefaultMQProducer mqProducer;
 
-    public RocketMq() throws MQClientException {
+    public RocketMqProducer() throws MQClientException {
         mqProducer = new DefaultMQProducer("test");
-        mqProducer.setNamesrvAddr("localhost:9876");
+        mqProducer.setNamesrvAddr("10.227.18.178:9876"); //use dev box
         mqProducer.start();
+        mqProducer.setSendMsgTimeout(60000);
     }
 
+    //
     public void sendSyncMsg() throws Exception {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 2; i++) {
             Message msg = new Message("TestTopic", "TestTag", ("Hello " + i).getBytes(RemotingHelper.DEFAULT_CHARSET));
-            var result = mqProducer.send(msg);
+            SendResult result = mqProducer.send(msg);
             System.out.println("send " + i + " result = " + result);
         }
-        mqProducer.shutdown();
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            mqProducer.shutdown();
+        }).start();
+
     }
 }
