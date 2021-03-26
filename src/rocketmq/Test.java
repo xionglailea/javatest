@@ -8,6 +8,8 @@ public class Test {
 
     public static void main(String[] args) throws Exception {
         RocketMqProducer rocketMq = new RocketMqProducer();
-        rocketMq.sendSyncMsg();
+        //rocketMq.sendSyncMsgOneBroker();
+        rocketMq.sendSyncMsgMultiBroker();
+        //rocketMq.sendAsyncMsg();
     }
 }
