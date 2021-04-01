@@ -9,7 +9,8 @@ public class Test {
     public static void main(String[] args) throws Exception {
         RocketMqProducer rocketMq = new RocketMqProducer();
         //rocketMq.sendSyncMsgOneBroker();
-        rocketMq.sendSyncMsgMultiBroker();
+        //rocketMq.sendSyncMsgMultiBroker();
         //rocketMq.sendAsyncMsg();
+        rocketMq.sendOrder();
     }
 }

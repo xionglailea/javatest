@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds" debug="false">
+    <property name="LOG_HOME" value="./logs"/>
+
+    <!-- appender -->
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yy-MM-dd.HH:mm:ss.SSS} [%-16t] %-5p %-22c{0} %X{ServiceId} - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="RocketmqClientAppender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/rocketmq.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/rocketmq.log.%d{yyyy-MM-dd}
+            </fileNamePattern>
+            <TimeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>30MB</MaxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder charset="UTF-8">
+            <pattern>%d{yy-MM-dd.HH:mm:ss.SSS} [%-16t] %-5p %-22c{0} %X{ServiceId} - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="RocketmqClientAppender"/>
+    </root>
+
+</configuration>
