@@ -29,8 +29,8 @@ public class Test {
         //  System.out.println(System.currentTimeMillis() - now);
 
 
-          test1();
-          //testBatchRead();
+          //test1();
+          testBatchRead();
         //test11();
     }
 
@@ -142,7 +142,7 @@ public class Test {
         for (int i = 10000; i < 20000; i++) {
             roleIds.add(i);
         }
-        ////storage.testBatchRead(roleIds);
+        storage.testBatchRead(roleIds);
         ////var roleIds2 = new ArrayList<Integer>();
         //for (int i = 31000; i < 32000; i++) {
         //    roleIds.add(i);
@@ -152,7 +152,7 @@ public class Test {
         //for (int i = 32000; i < 33000; i++) {
         //    roleIds3.add(i);
         //}
-        storage.testBatchReadWithOutCursor(roleIds);
+        //storage.testBatchReadWithOutCursor(roleIds);
         long end = System.currentTimeMillis();
         System.out.println("cost time = " + (end - start));
     }

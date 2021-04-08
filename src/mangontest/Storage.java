@@ -123,7 +123,8 @@ public class Storage {
 
     public void testBatchRead(List<Integer> roleIds) {
         var collection = getCollection("roleInfo");
-        var cursor = collection.find(Filters.in("_id", roleIds)).cursor();
+        var cursor = collection.find(Filters.and(Filters.in("_id", roleIds), Filters.gt("_id", 15000))).cursor();
+
         try {
             while (cursor.hasNext()) {
                 System.out.println(cursor.next().toJson());
