@@ -19,7 +19,7 @@ public class RedisConfig {
     jedisPoolConfig.setMaxIdle(10);
     jedisPoolConfig.setMinIdle(1);
     jedisPoolConfig.setMaxWaitMillis(500);
-    pool = new JedisPool(jedisPoolConfig, ip);
+    pool = new JedisPool("redis://:foobared@10.227.18.178:6379");
   }
 
   public Jedis getCon() {

@@ -13,7 +13,8 @@ public class Test {
     // testMap(connect);
     // testList(connect);
     // testSortedSet(connect);
-    testScript(connect);
+    //testScript(connect)
+      connect.set("test", "xiong");
   }
 
   public static void testMap(Jedis jedis) {
