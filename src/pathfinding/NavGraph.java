@@ -579,6 +579,9 @@ public final class NavGraph {
         }
     }
 
+    /**
+     * 每一个寻路点信息
+     */
     private final class Node {
 
         public final int id;
@@ -609,6 +612,10 @@ public final class NavGraph {
         }
     }
 
+
+    /**
+     * 边信息
+     */
     private class EdgeInfo {
 
         public final Edge edge;
@@ -634,6 +641,9 @@ public final class NavGraph {
         }
     }
 
+    /**
+     * 多边形信息
+     */
     private class ConvexInfo {
 
         public final int id;
@@ -668,6 +678,13 @@ public final class NavGraph {
             s.append("}");
             return s.toString();
         }
+    }
+
+    /**
+     * 快速查找点落在哪个多边形区域内
+     */
+    private class QuickFindPointInConvex {
+
     }
 
 }
