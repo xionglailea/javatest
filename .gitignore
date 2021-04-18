@@ -6,3 +6,4 @@ data
 Java2C#.iml
 gradlew
 gradlew.bat
+gc*
