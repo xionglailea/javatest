@@ -8,27 +8,28 @@ public final class Rect {
 		return new Rect(Double.MAX_VALUE, Double.MIN_VALUE, Double.MAX_VALUE, Double.MIN_VALUE);
 	}
 	
-//	public static Rect makeBox(Collection<Vector3> vs) {
-//		final Rect box = emptyBox();
-//		for(Vector3 v : vs) {
-//			box.minx = Math.min(box.minx, v.x);
-//			box.maxx = Math.max(box.maxx, v.x);
-//			box.minz = Math.min(box.minz, v.z);
-//			box.maxz = Math.max(box.maxz, v.z);				
-//		}
-//		return box;
-//	}
+	public static Rect makeBox(Vertex[] vs) {
+        final Rect box = emptyBox();
+        for(Vertex v : vs) {
+            box.minx = Math.min(box.minx, v.position.x);
+            box.maxx = Math.max(box.maxx, v.position.x);
+            box.minz = Math.min(box.minz, v.position.z);
+            box.maxz = Math.max(box.maxz, v.position.z);
+        }
+        return box;
+	}
 	
 	public static Rect makeBox(Collection<Vertex> vs) {
 		final Rect box = emptyBox();
 		for(Vertex v : vs) {
-			box.minx = Math.min(box.minx, v.postion.x);
-			box.maxx = Math.max(box.maxx, v.postion.x);
-			box.minz = Math.min(box.minz, v.postion.z);
-			box.maxz = Math.max(box.maxz, v.postion.z);				
+			box.minx = Math.min(box.minx, v.position.x);
+			box.maxx = Math.max(box.maxx, v.position.x);
+			box.minz = Math.min(box.minz, v.position.z);
+			box.maxz = Math.max(box.maxz, v.position.z);
 		}
 		return box;
 	}
+
 	
 	public double minx;
 	public double maxx;
@@ -54,7 +55,7 @@ public final class Rect {
 	}
 	
 	public void plus(Vertex v) {
-		plus(v.postion);
+		plus(v.position);
 	}
 	
 	public void plus(Collection<Vertex> ps) {
@@ -78,4 +79,23 @@ public final class Rect {
 		final double z = Math.min(Math.max(p.z, minz), maxz);
 		return x == p.x && z == p.z ? p : new Vector3(x, p.y, z);
 	}
+
+	public double xRange() {
+	    return maxx - minx;
+    }
+
+    public double zRange() {
+	    return maxz - minz;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Rect{");
+        sb.append("minx=").append(minx);
+        sb.append(", maxx=").append(maxx);
+        sb.append(", minz=").append(minz);
+        sb.append(", maxz=").append(maxz);
+        sb.append('}');
+        return sb.toString();
+    }
 }

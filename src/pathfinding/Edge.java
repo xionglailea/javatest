@@ -25,6 +25,6 @@ public final class Edge {
 	
 	@Override
 	public String toString() {
-		return  String.format("Edge{%s(%s), %s(%s)} ", v1.id, v1.postion, v2.id, v2.postion);
+		return  String.format("Edge{%s(%s), %s(%s)} ", v1.id, v1.position, v2.id, v2.position);
 	}
 }

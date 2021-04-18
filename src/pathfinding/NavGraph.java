@@ -13,6 +13,10 @@ public final class NavGraph {
     private final int COST_OF_NODE = 1;
     private final long INFINITY = 1000000L;
     public double PAD_DISTANCE = 3;
+    private float minSearchRangeX = 2f;
+    private float minSearchRangeZ = 2f;
+    private int maxConvexInOneNode = 3; //一个搜索区域内最多有几个多边形
+    private SearchManager searchManager;
 
     public NavGraph(Mesh g) {
         g.check();
@@ -38,8 +42,8 @@ public final class NavGraph {
         }
         // 构造出所有路径结点
         for (EdgeInfo e : edgeInfoMap.values()) {
-            final Vector3 v1 = e.edge.v1.postion;
-            final Vector3 v2 = e.edge.v2.postion;
+            final Vector3 v1 = e.edge.v1.position;
+            final Vector3 v2 = e.edge.v2.position;
             Vector3 ab = v2.sub(v1);
             final double edgeLength = ab.getMagnitude();
             // 每条边至少拆分成两段
@@ -134,6 +138,7 @@ public final class NavGraph {
         //calcCompatRate(nodePaths);
         //save(cacheFile);
         // }
+        searchManager = new SearchManager(g.range, convexs);
     }
 
     private int calcCost(Vector3 v1, Vector3 v2) {
@@ -185,8 +190,8 @@ public final class NavGraph {
         EdgeInfo nearestEdge = null;
         double minSquareDistance = INFINITY * INFINITY;
         for (EdgeInfo e : edges) {
-            final Vector3 v1 = e.edge.v1.postion;
-            final Vector3 v2 = e.edge.v2.postion;
+            final Vector3 v1 = e.edge.v1.position;
+            final Vector3 v2 = e.edge.v2.position;
             final Vector3 v12 = v1.sub(v2);
             final Vector3 p1 = pos.sub(v1);
             final Vector3 p2 = pos.sub(v2);
@@ -224,8 +229,8 @@ public final class NavGraph {
         Vector3 nearestPos = null;
         double minSquareDistance = INFINITY * INFINITY;
         for (EdgeInfo e : edges) {
-            final Vector3 v1 = e.edge.v1.postion;
-            final Vector3 v2 = e.edge.v2.postion;
+            final Vector3 v1 = e.edge.v1.position;
+            final Vector3 v2 = e.edge.v2.position;
             final Vector3 v12 = v1.sub(v2);
             final Vector3 p1 = pos.sub(v1);
             final Vector3 p2 = pos.sub(v2);
@@ -256,7 +261,7 @@ public final class NavGraph {
     }
 
     private boolean lineCrossSegment(Vector3 a, Vector3 b, Edge e) {
-        return MathUtil.lineCrossSegment(a, b, e.v1.postion, e.v2.postion);
+        return MathUtil.lineCrossSegment(a, b, e.v1.position, e.v2.position);
     }
 
     private boolean lineCrossAllSegments(Vector3 a, Vector3 b, ArrayList<Node> ns) {
@@ -283,7 +288,7 @@ public final class NavGraph {
         System.out.println("==========dumpPath. end=============");
     }
 
-    private PositionInfo getPositionInfo(Vector3 pos) {
+    public PositionInfo getPositionInfo(Vector3 pos) {
         final PositionInfo pi = new PositionInfo();
         final ConvexInfo convex = convexs.stream().filter(c -> c.convex.contains(pos)).findFirst().orElse(null);
         if (convex != null) {
@@ -293,6 +298,10 @@ public final class NavGraph {
             chooseNearestPositionAndNode(pos, this.edges, pi);
         }
         return pi;
+    }
+
+    public ConvexInfo findConvexByPoint(Vector3 point) {
+        return searchManager.search(point);
     }
 
     public boolean isValidPosition(Vector3 pos) {
@@ -463,8 +472,8 @@ public final class NavGraph {
             for (int i = 0, n = pathNodes.size(); i < n; i++) {
                 final Node cur = pathNodes.get(i);
                 Vector3 nodeLeg = cur.position.sub(viewPosition);
-                Vector3 legLeft = cur.edge.v1.postion.sub(viewPosition);
-                Vector3 legRight = cur.edge.v2.postion.sub(viewPosition);
+                Vector3 legLeft = cur.edge.v1.position.sub(viewPosition);
+                Vector3 legRight = cur.edge.v2.position.sub(viewPosition);
                 //				System.out.printf("minleft:%s minright:%s left:%s right:%s\n", minLegLeft, minLegRight, legLeft,
                 //				legRight);
                 //				// 合并太近的结点
@@ -492,7 +501,7 @@ public final class NavGraph {
                     final Node lastNode = pathNodes.get(i);
                     final Vector3 temp = viewPosition;
                     viewPosition = choosePosition2(preViewPosition, viewPosition, cur.position,
-                        lastNode.edge.v1.postion, lastNode.edge.v2.postion,
+                        lastNode.edge.v1.position, lastNode.edge.v2.position,
                         minLegLeft, minLegRight, true);
                     preViewPosition = temp;
                     vertexs.add(viewPosition);
@@ -504,7 +513,7 @@ public final class NavGraph {
                     final Node lastNode = pathNodes.get(i);
                     final Vector3 temp = viewPosition;
                     viewPosition = choosePosition2(preViewPosition, viewPosition, cur.position,
-                        lastNode.edge.v1.postion, lastNode.edge.v2.postion,
+                        lastNode.edge.v1.position, lastNode.edge.v2.position,
                         minLegLeft, minLegRight, false);
                     preViewPosition = temp;
                     vertexs.add(viewPosition);
@@ -612,7 +621,6 @@ public final class NavGraph {
         }
     }
 
-
     /**
      * 边信息
      */
@@ -681,9 +689,108 @@ public final class NavGraph {
     }
 
     /**
-     * 快速查找点落在哪个多边形区域内
+     * 快速查找任意点落在哪个多边形区域内
      */
-    private class QuickFindPointInConvex {
+    private class SearchManager {
+
+        private final Rect mapRange;
+        private final SearchNode root;
+
+        public SearchManager(Rect range, List<ConvexInfo> convexInfos) {
+            this.mapRange = range;
+            root = new SearchNode(mapRange);
+            for (var convexInfo : convexInfos) {
+                root.addConvex(convexInfo);
+            }
+        }
+
+        public ConvexInfo search(Vector3 point) {
+            return root.findConvexContainPoint(point);
+        }
+
+    }
+
+    private class SearchNode {
+        private final Rect searchRange;
+        private SearchNode[] children;
+        private List<ConvexInfo> curNodeConvex; //当前节点内的多边形
+
+        public SearchNode(Rect searchRange) {
+            this.searchRange = searchRange;
+            curNodeConvex = new ArrayList<>();
+        }
+
+        /**
+         * 一个节点内多边形太多，划分成更小的区域
+         */
+        private void split() {
+            children = new SearchNode[4];
+            double centerX = searchRange.xRange() / 2 + searchRange.minx;
+            double centerZ = searchRange.zRange() / 2 + searchRange.minz;
+            Rect leftDown = new Rect(searchRange.minx, centerX, searchRange.minz, centerZ);
+            children[0] = new SearchNode(leftDown);
+            Rect rightDown = new Rect(centerX, searchRange.maxx, searchRange.minz, centerZ);
+            children[1] = new SearchNode(rightDown);
+            Rect leftUp = new Rect(searchRange.minx, centerX, centerZ, searchRange.maxz);
+            children[2] = new SearchNode(leftUp);
+            Rect rightUp = new Rect(centerX, searchRange.maxx, centerZ, searchRange.maxz);
+            children[3] = new SearchNode(rightUp);
+            this.curNodeConvex.removeIf(this::addToChildren);
+        }
+
+        public void addConvex(ConvexInfo convexInfo) {
+            //优先往子节点放,成功了就返回
+            if (children != null) {
+                boolean result = addToChildren(convexInfo);
+                if (result) {
+                    return;
+                }
+            }
+            //子节点放不进去
+            this.curNodeConvex.add(convexInfo);
+            //如果当前节点数目超过了上限，而且还能继续拆分，构造子节点
+            if (this.curNodeConvex.size() >= maxConvexInOneNode && children == null && (searchRange.xRange() > minSearchRangeX && searchRange.zRange() > minSearchRangeZ)) {
+                System.out.println("Rect = " + searchRange + " split!");
+                split();
+            }
+        }
+
+        private boolean addToChildren (ConvexInfo convexInfo) {
+            for (var child : children) {
+                if (child.contains(convexInfo)) {
+                    child.addConvex(convexInfo);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        //判断一个多边形顶点是否都在当前搜索节点范围内
+        private boolean contains(ConvexInfo convexInfo) {
+            for (var vertex : convexInfo.convex.vertexs) {
+                if (!searchRange.contains(vertex.position)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        //todo 处理不在任何多边形区域的情况
+        public ConvexInfo findConvexContainPoint(Vector3 point) {
+            //优先从当前节点中找
+            for (var convexInfo : this.curNodeConvex) {
+                if (convexInfo.convex.contains(point)) {
+                    return convexInfo;
+                }
+            }
+            //找不到，再去子节点中找，
+            for (var child : children) {
+                if (child.searchRange.contains(point)) {
+                    return child.findConvexContainPoint(point);
+                }
+            }
+            return null;
+        }
 
     }
 

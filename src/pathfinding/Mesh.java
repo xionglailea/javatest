@@ -10,6 +10,7 @@ public final class Mesh {
 	public final List<Convex> convexs;
 	public final double edgeNodeSplitLength;
 	public final String name;
+	public Rect range;
 	public Mesh(String name, double edgeNodeSplitLength, Collection<Convex> cs) {
 		this.name=name;
 		this.edgeNodeSplitLength=edgeNodeSplitLength;
@@ -21,6 +22,7 @@ public final class Mesh {
     public Mesh(CfgMesh ncfg) {
         this.name = ncfg.name;
         this.edgeNodeSplitLength = 10;
+
         {
             final int n = ncfg.vertexs.size();
             final Vertex[] vertexs = new Vertex[n];
@@ -29,7 +31,7 @@ public final class Mesh {
                 final Vector3 ppos = new Vector3(cpos.x, cpos.y, cpos.z);
                 int j;
                 for (j = 0; j < i; j++) {
-                    if (ppos.getSubXZMagnitude(vertexs[j].postion) < COMBIND_XZ_DISTANCE && Math.abs(ppos.y - vertexs[j].postion.y) < COMBIND_Y_DISTANCE) {
+                    if (ppos.getSubXZMagnitude(vertexs[j].position) < COMBIND_XZ_DISTANCE && Math.abs(ppos.y - vertexs[j].position.y) < COMBIND_Y_DISTANCE) {
                         vertexs[i] = vertexs[j];
                         break;
                     }
@@ -38,6 +40,7 @@ public final class Mesh {
                     vertexs[i] = new Vertex(i, ppos);
                 }
             }
+            this.range = Rect.makeBox(vertexs);
             this.convexs = ncfg.convexes.stream().map(c -> {
                 final Convex convex = new Convex();
                 c.vertexids.stream().map(id -> vertexs[id]).forEach(convex.vertexs::add);

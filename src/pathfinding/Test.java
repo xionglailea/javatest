@@ -13,8 +13,11 @@ public class Test {
     CfgMesh data = prepareData();
     Mesh mesh = new Mesh(data);
     NavGraph navMesh = new NavGraph(mesh);
-    Path path = navMesh.findPath(new Vector3(0,0,0), new Vector3(4,0,4));
-    System.out.println(path);
+    Vector3 point = new Vector3(1, 0, 2.2);
+    var result1 = navMesh.getPositionInfo(point);
+    var result2 = navMesh.findConvexByPoint(point);
+    //Path path = navMesh.findPath(new Vector3(0,0,0), new Vector3(4,0,4));
+    System.out.println("haha");
   }
 
   public static CfgMesh prepareData() {

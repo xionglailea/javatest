@@ -16,11 +16,11 @@ public final class Convex {
             return false;
         int size = vertexs.size();
 		for(int i = 0 ; i < size - 2 ; i++) {
-			if(MathUtil.leftOf(vertexs.get(i).postion, vertexs.get(i + 1).postion, vertexs.get(i + 2).postion))
+			if(MathUtil.leftOf(vertexs.get(i).position, vertexs.get(i + 1).position, vertexs.get(i + 2).position))
 				return false;
 		}
-		return !MathUtil.leftOf(vertexs.get(size - 2).postion, vertexs.get(size - 1).postion, vertexs.get(0).postion)
-			&& !MathUtil.leftOf(vertexs.get(size - 1).postion, vertexs.get(0).postion, vertexs.get(1).postion);
+		return !MathUtil.leftOf(vertexs.get(size - 2).position, vertexs.get(size - 1).position, vertexs.get(0).position)
+			&& !MathUtil.leftOf(vertexs.get(size - 1).position, vertexs.get(0).position, vertexs.get(1).position);
 	}
 
     // 尝试修复 三边形
@@ -46,9 +46,9 @@ public final class Convex {
 	public boolean contains(Vector3 p) {
 		int size = vertexs.size();
 		for(int i = 0 ; i < size - 1 ; i++) {
-			if(MathUtil.leftOf(vertexs.get(i).postion, vertexs.get(i+1).postion, p)) return false;
+			if(MathUtil.leftOf(vertexs.get(i).position, vertexs.get(i+1).position, p)) return false;
 		}
-		return !MathUtil.leftOf(vertexs.get(size - 1).postion, vertexs.get(0).postion, p);
+		return !MathUtil.leftOf(vertexs.get(size - 1).position, vertexs.get(0).position, p);
 	}
 	
 	@Override
@@ -58,7 +58,7 @@ public final class Convex {
 		b.append("[" + vertexs.size() + "] ");
 		for(Vertex v : vertexs) {
 			b.append(v.id);
-			b.append(v.postion.toString());
+			b.append(v.position.toString());
 			b.append(',');
 		}
 		b.append("}");
