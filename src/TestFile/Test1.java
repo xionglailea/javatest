@@ -2,6 +2,7 @@ package TestFile;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
@@ -57,6 +58,9 @@ public class Test1 {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        int[] a = {1};
+        a[0]++;
+        System.out.println(Arrays.toString(a));
         //        Queue<Integer> a = new LinkedList<>();
         //        a.add(1);
         //        a.add(2);
