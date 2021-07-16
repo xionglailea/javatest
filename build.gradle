@@ -55,5 +55,7 @@ dependencies {
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.4.8'
 
+// https://mvnrepository.com/artifact/io.projectreactor/reactor-test
+    testImplementation group: 'io.projectreactor', name: 'reactor-test', version: '3.4.8'
 
 }
