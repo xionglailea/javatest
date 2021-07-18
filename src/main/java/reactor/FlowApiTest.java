@@ -15,8 +15,8 @@ import java.util.function.Function;
 public class FlowApiTest {
 
     public static void main(String[] args) throws Exception {
-        //new FlowApiTest().testCompletableFuture();
-        new FlowApiTest().testFlow();
+        new FlowApiTest().testCompletableFuture();
+        //new FlowApiTest().testFlow();
     }
 
     public void testFlow() throws InterruptedException {
@@ -118,6 +118,7 @@ public class FlowApiTest {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+        //completableFuture不支持懒加载
         CompletableFuture.supplyAsync(this::getString).thenApply((Function<String, String>) s -> {
             System.out.println("receive " + s);
             return s + " haha";
@@ -158,5 +159,10 @@ public class FlowApiTest {
         }
     }
 
+
+
+    public void testFlux() {
+
+    }
 
 }
