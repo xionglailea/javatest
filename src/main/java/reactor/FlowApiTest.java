@@ -4,7 +4,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.LongConsumer;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * jdk自带的响应式接口
@@ -15,8 +22,9 @@ import java.util.function.Function;
 public class FlowApiTest {
 
     public static void main(String[] args) throws Exception {
-        new FlowApiTest().testCompletableFuture();
+        //new FlowApiTest().testCompletableFuture();
         //new FlowApiTest().testFlow();
+        new FlowApiTest().testFlux();
     }
 
     public void testFlow() throws InterruptedException {
@@ -162,7 +170,36 @@ public class FlowApiTest {
 
 
     public void testFlux() {
+        Flux<String> flux = Flux.just("xiong", "jie").map(s -> {
+            System.out.println("convert " + s);
+            return s + " hah";
+        });
+        flux.subscribe(s -> System.out.println("consume " + s), null, () -> System.out.println("consume complete"));
+        Flux.range(4,2).subscribe(System.out::println);
+        Flux.range(1,5).doOnSubscribe(subscription -> System.out.println(subscription + "subscribe")).subscribe(integer -> System.out.println("consume " + integer));
 
+        //Scheduler s = Schedulers.newParallel("parallel-scheduler", 4);
+        //
+        //final Flux<String> flux1= Flux
+        //    .range(1, 2)
+        //    .map(i -> {
+        //        System.out.println(Thread.currentThread().getName() + " map " + i);
+        //        return 10 + i;
+        //    })
+        //    .publishOn(s)
+        //    .map(i -> {
+        //        System.out.println(Thread.currentThread().getName() + " map " + i);
+        //        return "value " + i;
+        //    });
+        //
+        //new Thread(() -> flux1.subscribe(i -> System.out.println(Thread.currentThread().getName() + " " + i))).start();
+
+        Flux.range(10, 2).flatMap(new Function<Integer, Publisher<?>>() {
+            @Override
+            public Publisher<?> apply(Integer integer) {
+                return Flux.just(integer  * 2);
+            }
+        }).subscribe(e -> System.out.println(e));
     }
 
 }
