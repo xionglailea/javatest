@@ -22,9 +22,9 @@ import reactor.core.scheduler.Schedulers;
 public class FlowApiTest {
 
     public static void main(String[] args) throws Exception {
-        //new FlowApiTest().testCompletableFuture();
+        new FlowApiTest().testCompletableFuture();
         //new FlowApiTest().testFlow();
-        new FlowApiTest().testFlux();
+        //new FlowApiTest().testFlux();
     }
 
     public void testFlow() throws InterruptedException {
@@ -121,11 +121,13 @@ public class FlowApiTest {
     }
 
     public void testCompletableFuture() {
-        try {
-            CompletableFuture.runAsync(this::do1).thenRun(this::do2).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        CompletableFuture.runAsync(this::do1).exceptionally(throwable -> {
+            System.out.println(throwable.getMessage());
+            return null;
+        }).thenRunAsync(this::do2);
+
+
+
         //completableFuture不支持懒加载
         CompletableFuture.supplyAsync(this::getString).thenApply((Function<String, String>) s -> {
             System.out.println("receive " + s);
@@ -140,12 +142,14 @@ public class FlowApiTest {
     }
 
     public void do1() {
-        System.out.println("do 1");
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        throw new RuntimeException(Thread.currentThread().getName() + " do1 error");
+        //System.out.println(Thread.currentThread().getName() + " do 1");
+        //
+        //try {
+        //    Thread.sleep(50);
+        //} catch (InterruptedException e) {
+        //    e.printStackTrace();
+        //}
     }
 
     public String getString() {
@@ -159,7 +163,7 @@ public class FlowApiTest {
     }
 
     public void do2() {
-        System.out.println("do 2");
+        System.out.println(Thread.currentThread().getName() + " do 2");
         try {
             Thread.sleep(50);
         } catch (InterruptedException e) {

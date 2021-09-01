@@ -3,6 +3,7 @@ import java.util.function.Consumer;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -27,24 +28,20 @@ public class TestReactor {
 
     @Test
     public void test1() {
-        Flux.just(1, 2, 3, 4)
+        Flux<Integer> flux = Flux.just(1, 2, 3, 4)
             .log()
             .map(i -> {
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 return i * 2;
-            })
-            .subscribe(e -> logger.info("get:{}", e));
+            });
+        flux.subscribe(e -> logger.info("get:{}", e));
+
     }
 
     @Test
     public void testFlatMap() {
         Flux.just(1, 2, 3, 4)
             .log()
-            .flatMap(e -> Flux.just(e * 2)).take(1)
+            .flatMap(e -> Flux.just(e * 2))
             .subscribe(e -> logger.info("get:{}", e));
         try {
             TimeUnit.SECONDS.sleep(2);
@@ -119,7 +116,7 @@ public class TestReactor {
         Scheduler s = Schedulers.newParallel("parallel-scheduler", 4);
 
         final Flux<String> flux1 = Flux
-            .range(1, 2).log()
+            .range(1, 2)
             .map(i -> {
                 System.out.println(Thread.currentThread().getName() + " map " + i);
                 return 10 + i;
@@ -139,5 +136,45 @@ public class TestReactor {
         }
     }
 
+
+    @Test
+    public void testMultiSubscribers() throws InterruptedException {
+        Flux<Integer> source = Flux.range(1, 3).log()
+            .doOnSubscribe(s -> System.out.println("subscribed to source"));
+
+        ConnectableFlux<Integer> co = source.publish();
+
+        co.subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) {
+                System.out.println(Thread.currentThread().getName() + " sub1 receive " + integer);
+            }
+        }, e -> {
+        }, () -> {
+        });
+        co.publishOn(Schedulers.boundedElastic()).log().subscribe(integer -> {
+            try {
+                System.out.println(Thread.currentThread().getName() + " sub2 receive " +  integer);
+                Thread.sleep(1000);
+                System.out.println(integer);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }, e -> {
+        }, () -> {
+        });
+
+        System.out.println("done subscribing");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("will now connect");
+
+        co.connect();
+
+        Thread.sleep(5000);
+    }
 
 }
