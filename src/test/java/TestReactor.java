@@ -1,6 +1,8 @@
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import org.junit.Test;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.ConnectableFlux;
@@ -41,7 +43,7 @@ public class TestReactor {
     public void testFlatMap() {
         Flux.just(1, 2, 3, 4)
             .log()
-            .flatMap(e -> Flux.just(e * 2))
+            .flatMap(e -> Flux.just(e * 2, e * 3))
             .subscribe(e -> logger.info("get:{}", e));
         try {
             TimeUnit.SECONDS.sleep(2);
@@ -81,16 +83,18 @@ public class TestReactor {
         // impact the execution context of onNext/onError/onComplete signals
         // from the beginning of the chain up to the next occurrence of a publishOn.
 
-        blockWrapper.subscribeOn(Schedulers.boundedElastic()).doOnSubscribe(e -> {
-            System.out.println("subscribe " + Thread.currentThread().getName());
-        }).subscribe(s -> Mono.just(s).log().publishOn(Schedulers.single()).subscribe(e -> {
-            System.out.println("last accept " + Thread.currentThread().getName() + " " + e);
-        }, null, new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("last complete " + Thread.currentThread().getName());
-            }
-        }));
+        blockWrapper.subscribeOn(Schedulers.boundedElastic()).subscribe(e -> System.out.println(e));
+
+        //blockWrapper.subscribeOn(Schedulers.boundedElastic()).doOnSubscribe(e -> {
+        //    System.out.println("subscribe " + Thread.currentThread().getName());
+        //}).subscribe(s -> Mono.just(s).log().publishOn(Schedulers.single()).subscribe(e -> {
+        //    System.out.println("last accept " + Thread.currentThread().getName() + " " + e);
+        //}, null, new Runnable() {
+        //    @Override
+        //    public void run() {
+        //        System.out.println("last complete " + Thread.currentThread().getName());
+        //    }
+        //}));
         try {
             Thread.sleep(4000);
         } catch (InterruptedException e) {
@@ -175,6 +179,32 @@ public class TestReactor {
         co.connect();
 
         Thread.sleep(5000);
+    }
+
+
+    @Test
+    public void testPublishOn() throws InterruptedException {
+        var flux = Flux.range(1,5).log().map(e -> {
+            System.out.println(Thread.currentThread() + " map " + e);
+            return e * 2;
+        }).publishOn(Schedulers.boundedElastic()).log();
+        flux.subscribe(e -> {
+            System.out.println(Thread.currentThread() + " " + e);
+        });
+        Thread.sleep(2000);
+    }
+
+    @Test
+    public void testConcatMap() {
+        var flux = Flux.just(1, 10);
+        flux.concatMap(new Function<Integer, Publisher<?>>() {
+            @Override
+            public Publisher<?> apply(Integer integer) {
+                return Flux.just(integer + 1, integer + 2);
+            }
+        }).subscribe(e -> {
+            System.out.println(e);
+        });
     }
 
 }
